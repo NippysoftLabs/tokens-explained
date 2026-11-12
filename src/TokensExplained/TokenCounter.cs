@@ -48,7 +48,9 @@ public sealed class TokenCounter
         {
             pending.Add(id);
             var decoded = _tokenizer.Decode(pending) ?? "";
-            if (decoded.Contains(Replacement)) continue; // still part of a character
+            // Still part of a character: the decoded text ends in U+FFFD. A UTF-8 character has at most 4
+            // bytes, so after 4 tokens the U+FFFD is real text (a badly decoded file has them) and is shown.
+            if (decoded.EndsWith(Replacement) && pending.Count < 4) continue;
             pieces.Add(pending.Count == 1 ? decoded : $"{decoded} ({pending.Count} tokens)");
             pending.Clear();
         }

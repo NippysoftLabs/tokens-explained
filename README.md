@@ -44,7 +44,7 @@ cd tokens-explained
 dotnet test
 ```
 
-The last line of `dotnet test` should report 24 passed and 0 failed.
+The last line of `dotnet test` should report 25 passed and 0 failed.
 
 Two more things you can run, from the repository root:
 
@@ -64,7 +64,7 @@ The same `dotnet test` runs in CI (`.github/workflows/test.yml`).
 - **Counts for other models.** Every count here is `o200k_base`. Claude, Gemini and other models can cut text differently, and Anthropic documents that Claude Opus 4.7 and later produce about 30% more tokens for the same text than earlier Claude models.
 - **Long text without spaces.** Counting time grows with the square of the length of a stretch without whitespace: on the machine used for this repository, 'a' repeated 10,000 times took about 0.1 s and 20,000 times between 0.4 and 0.5 s (times vary by run; `tools/HostileInputs` prints them). `TokenCounter` rejects a stretch longer than 10,000 characters (configurable) instead of counting it; a pasted base64 image or a minified file can hit that limit.
 - **The full request.** A real request adds tokens for message roles, tools, images and files. `TokenCounter` counts plain text only.
-- **Unicode forms.** "canción" typed with a separate accent mark (NFD) is cut differently from the usual form (NFC); in this tokenizer both give 3 tokens, but the pieces differ. Text is not normalized before counting.
+- **Unicode forms.** "canción" typed with a separate accent mark (NFD) is cut differently from the usual form (NFC); in this tokenizer both give 3 tokens, but the pieces differ. Text is not normalized before counting. `Pieces` joins tokens that end in half a character (U+FFFD when decoded), up to 4 tokens, the most a UTF-8 character needs; a real U+FFFD in the text (a badly decoded file has them) is shown joined to the next token.
 - **Prices.** `config/prices.json` was copied by hand from each provider's pricing page on the date in `checkedOn`. Prices change: Google's page already lists a higher Gemini 4 Carbon price from December 1, 2026. Batch discounts, long-context prices, regional multipliers and taxes are not modelled.
 - **Cache rules.** The simulator follows the automatic caching of the Claude API and assumes the cache never expires between turns; the Claude cache lasts 5 minutes by default. OpenAI and Gemini cache on their own terms (minimums, lifetimes, write prices); Gemini publishes no separate write price, so writes are charged as input.
 - **Context window.** The simulator does not stop when the chat outgrows the model's context window: 1,000 turns of 2,000 + 2,000 tokens send almost 4 million tokens on the last turn. Real chat apps summarize or drop old messages first.

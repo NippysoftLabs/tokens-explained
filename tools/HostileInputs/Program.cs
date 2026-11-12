@@ -41,6 +41,13 @@ Run("Chinese \"hello world\"", () => counter.Pieces("你好世界"));
 Run("20-digit number", () => counter.Pieces("12345678901234567890"));
 Run("same word 100 times", () => counter.Count(string.Join(' ', Enumerable.Repeat("factura", 100))));
 Run("lone surrogate", () => counter.Pieces("a\uD800b"));
+Run("real U+FFFD in the text (badly decoded file)", () => counter.Pieces("Error � in the file name."));
+Run("real U+FFFD followed by 8,000 words, pieces timed", () =>
+{
+    var watch = System.Diagnostics.Stopwatch.StartNew();
+    var count = counter.Pieces("�" + string.Concat(Enumerable.Repeat(" word", 8_000))).Count;
+    return $"{count} pieces in {watch.ElapsedMilliseconds} ms";
+});
 Run("three lines with Windows (CRLF) and Unix (LF) line endings", () => counter.Count("a\r\nb\r\nc") + " and " + counter.Count("a\nb\nc"));
 
 Run("'a' repeated 5,000 times, timed (times vary by machine)", () => Timed(() => counter.Count(new string('a', 5_000))));

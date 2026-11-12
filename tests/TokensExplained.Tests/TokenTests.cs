@@ -48,6 +48,19 @@ public class TokenTests
     }
 
     [Fact]
+    public void A_real_replacement_character_does_not_swallow_the_rest_of_the_text()
+    {
+        const string text = "Error � in the file name, please check the other twenty words here.";
+
+        var pieces = Counter.Pieces(text);
+
+        Assert.Equal(15, Counter.Count(text));
+        Assert.Equal(14, pieces.Count);
+        Assert.Equal(" � in (2 tokens)", pieces[1]);
+        Assert.Equal(" file", pieces[3]);
+    }
+
+    [Fact]
     public void The_same_text_in_Spanish_takes_more_tokens_than_in_English()
     {
         var comparisons = Texts().Select(t => LanguageComparison.Of(Counter, t)).ToList();
