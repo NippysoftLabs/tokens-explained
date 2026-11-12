@@ -44,7 +44,7 @@ cd tokens-explained
 dotnet test
 ```
 
-The last line of `dotnet test` should report 22 passed and 0 failed.
+The last line of `dotnet test` should report 24 passed and 0 failed.
 
 Two more things you can run, from the repository root:
 
@@ -57,11 +57,12 @@ The same `dotnet test` runs in CI (`.github/workflows/test.yml`).
 
 ## The tokenizer
 
-`TokenCounter` uses `o200k_base`, the encoding that OpenAI publishes in tiktoken for GPT-4o and later OpenAI models, through Microsoft's `Microsoft.ML.Tokenizers` library. Claude and Gemini use their own tokenizers, which are not published as a library: the same text gives a different count there. To count for those models, use each provider's count endpoint (Claude: `/v1/messages/count_tokens`; Gemini: `count_tokens`; OpenAI: `/v1/responses/input_tokens`).
+`TokenCounter` uses `o200k_base`, the encoding that OpenAI's tiktoken maps to GPT-4o, through Microsoft's `Microsoft.ML.Tokenizers` library. Claude and Gemini use their own tokenizers, which are not published as a library: the same text gives a different count there. To count for those models, use each provider's count endpoint (Claude: `/v1/messages/count_tokens`; Gemini: `count_tokens`; OpenAI: `/v1/responses/input_tokens`).
 
 ## What this does not check
 
-- **Counts for other models.** Every count here is `o200k_base`. Claude, Gemini and older OpenAI models cut text differently, and Anthropic documents that Claude Opus 4.7 and later produce about 30% more tokens for the same text than earlier Claude models.
+- **Counts for other models.** Every count here is `o200k_base`. Claude, Gemini and other models can cut text differently, and Anthropic documents that Claude Opus 4.7 and later produce about 30% more tokens for the same text than earlier Claude models.
+- **Long text without spaces.** Counting time grows with the square of the length of a stretch without whitespace: on the machine used for this repository, 'a' repeated 10,000 times took about 0.13 s and 20,000 times about 0.47 s. `TokenCounter` rejects a stretch longer than 10,000 characters (configurable) instead of counting it; a pasted base64 image or a minified file can hit that limit.
 - **The full request.** A real request adds tokens for message roles, tools, images and files. `TokenCounter` counts plain text only.
 - **Unicode forms.** "canción" typed with a separate accent mark (NFD) is cut differently from the usual form (NFC); in this tokenizer both give 3 tokens, but the pieces differ. Text is not normalized before counting.
 - **Prices.** `config/prices.json` was copied by hand from each provider's pricing page on the date in `checkedOn`. Prices change: Google's page already lists a higher Gemini 4 Carbon price from December 1, 2026. Batch discounts, long-context prices, regional multipliers and taxes are not modelled.

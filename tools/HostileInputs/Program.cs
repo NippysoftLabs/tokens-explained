@@ -43,6 +43,12 @@ Run("same word 100 times", () => counter.Count(string.Join(' ', Enumerable.Repea
 Run("lone surrogate", () => counter.Pieces("a\uD800b"));
 Run("three lines with Windows (CRLF) and Unix (LF) line endings", () => counter.Count("a\r\nb\r\nc") + " and " + counter.Count("a\nb\nc"));
 
+Run("'a' repeated 5,000 times, timed (times vary by machine)", () => Timed(() => counter.Count(new string('a', 5_000))));
+Run("'a' repeated 10,000 times, timed", () => Timed(() => counter.Count(new string('a', 10_000))));
+Run("'a' repeated 10,001 times (over the run limit)", () => counter.Count(new string('a', 10_001)));
+Run("'a' repeated 20,000 times with a counter that allows it, timed", () => Timed(() => new TokenCounter(maxRunLength: 20_000).Count(new string('a', 20_000))));
+Run("10,000 words \"hello \" (with spaces), timed", () => Timed(() => counter.Count(string.Concat(Enumerable.Repeat("hello ", 10_000)))));
+
 Console.WriteLine();
 Console.WriteLine("B. Price list (config/prices.json format)");
 const string ok = "\"inputPerMillion\":2,\"outputPerMillion\":10,\"cacheReadPerMillion\":0.1,\"cacheWritePerMillion\":2.5,\"minCacheableTokens\":512,\"source\":\"https://example.com/pricing\",\"checkedOn\":\"2026-11-12\"";
@@ -78,3 +84,13 @@ Run("max_tokens 0", () => RequestBudget.Check(1_000, 0, price, 1m));
 Run("negative limit", () => RequestBudget.Check(1_000, 100, price, -1m));
 Run("worst case exactly at the limit", () => RequestBudget.Check(1_000_000, 100_000, price, 3m));
 Run("negative usage", () => RequestCost.Of(new Usage(-1, 0), price));
+var handMade = new Price("typo", -2m, 10m, 0.1m, 2.5m, 512, "https://example.com/pricing", "2026-11-12");
+Run("price built in code with a negative input price, cost of 1,000 input tokens", () => RequestCost.Of(new Usage(1_000, 0), handMade));
+Run("the same price in a budget check with limit 0", () => RequestBudget.Check(1_000_000, 1, handMade, 0m));
+
+static string Timed(Func<int> count)
+{
+    var watch = System.Diagnostics.Stopwatch.StartNew();
+    var tokens = count();
+    return $"{tokens} tokens in {watch.ElapsedMilliseconds} ms";
+}

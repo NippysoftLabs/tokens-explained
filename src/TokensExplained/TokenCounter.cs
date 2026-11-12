@@ -3,19 +3,34 @@ using Microsoft.ML.Tokenizers;
 namespace TokensExplained;
 
 /// <summary>
-/// Counts tokens with o200k_base, the public encoding that OpenAI's tiktoken uses for GPT-4o and later
-/// OpenAI models. It runs offline and calls no API. Claude and Gemini use their own tokenizers, so the
+/// Counts tokens with o200k_base, the public encoding that OpenAI's tiktoken maps to GPT-4o. It runs
+/// offline and calls no API. Other models, Claude and Gemini among them, use their own tokenizers, so the
 /// same text gives a different count there: use each provider's count endpoint for those models.
 /// </summary>
 public sealed class TokenCounter
 {
     public const string EncodingName = "o200k_base";
 
+    /// <summary>The default for the longest stretch of text without whitespace that is counted.</summary>
+    public const int DefaultMaxRunLength = 10_000;
+
     private readonly Tokenizer _tokenizer = TiktokenTokenizer.CreateForEncoding(EncodingName);
+    private readonly int _maxRunLength;
+
+    /// <param name="maxRunLength">
+    /// Counting time grows with the square of the length of a stretch without whitespace: 'a' repeated
+    /// 20,000 times took 3.5 to 3.7 times as long as 10,000 in the runs for this repository. Text from users (a pasted base64 image, a
+    /// minified file) can block the thread, so a longer stretch is rejected instead of counted.
+    /// </param>
+    public TokenCounter(int maxRunLength = DefaultMaxRunLength)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxRunLength);
+        _maxRunLength = maxRunLength;
+    }
 
     public int Count(string text)
     {
-        ArgumentNullException.ThrowIfNull(text);
+        CheckInput(text);
         return _tokenizer.CountTokens(text);
     }
 
@@ -26,7 +41,7 @@ public sealed class TokenCounter
     /// </summary>
     public IReadOnlyList<string> Pieces(string text)
     {
-        ArgumentNullException.ThrowIfNull(text);
+        CheckInput(text);
         var pieces = new List<string>();
         var pending = new List<int>();
         foreach (var id in _tokenizer.EncodeToIds(text))
@@ -39,6 +54,20 @@ public sealed class TokenCounter
         }
         if (pending.Count > 0) pieces.Add($"{_tokenizer.Decode(pending)} ({pending.Count} tokens)");
         return pieces;
+    }
+
+    private void CheckInput(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        var run = 0;
+        foreach (var c in text)
+        {
+            run = char.IsWhiteSpace(c) ? 0 : run + 1;
+            if (run > _maxRunLength)
+                throw new ArgumentException(
+                    $"The text has more than {_maxRunLength} characters in a row without whitespace; counting it would be slow.",
+                    nameof(text));
+        }
     }
 
     // U+FFFD, what UTF-8 decoding gives for an incomplete character.

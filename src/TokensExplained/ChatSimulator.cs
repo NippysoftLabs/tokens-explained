@@ -23,6 +23,7 @@ public static class ChatSimulator
         ArgumentNullException.ThrowIfNull(turns);
         ArgumentNullException.ThrowIfNull(price);
         ArgumentOutOfRangeException.ThrowIfNegative(systemTokens);
+        price.Validate();
 
         var result = new List<TurnCost>(turns.Count);
         long history = systemTokens; // what every later request sends again

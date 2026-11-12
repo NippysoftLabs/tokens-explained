@@ -108,6 +108,16 @@ public class CostTests
         Assert.Throws<ArgumentOutOfRangeException>(() => RequestBudget.Check(9_800, maxOutputTokens: 0, Sonnet, 1m));
     }
 
+    [Fact]
+    public void A_price_built_in_code_is_validated_too()
+    {
+        var typo = Sonnet with { InputPerMillion = -2m };
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => RequestCost.Of(new Usage(1_000, 0), typo));
+        Assert.Throws<ArgumentOutOfRangeException>(() => RequestBudget.Check(1_000_000, 1, typo, 0m));
+        Assert.Throws<ArgumentOutOfRangeException>(() => ChatSimulator.Run(1_000, [], typo, useCache: false));
+    }
+
     [Theory]
     [InlineData("\"source\":\"https://example.com/pricing\",", "")]                       // no source
     [InlineData("\"outputPerMillion\":10", "\"outputPerMillion\":-10")]                   // negative

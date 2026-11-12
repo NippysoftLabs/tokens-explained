@@ -61,6 +61,16 @@ public class TokenTests
     }
 
     [Fact]
+    public void A_long_stretch_without_whitespace_is_rejected_instead_of_counted_slowly()
+    {
+        Assert.Equal(1_250, Counter.Count(new string('a', TokenCounter.DefaultMaxRunLength)));
+        var ex = Assert.Throws<ArgumentException>(() => Counter.Count(new string('a', TokenCounter.DefaultMaxRunLength + 1)));
+        Assert.Contains("without whitespace", ex.Message);
+        // Whitespace resets the stretch: two halves separated by a space are counted.
+        Assert.Equal(1_251, Counter.Count(new string('a', 6_000) + " " + new string('a', 4_001)));
+    }
+
+    [Fact]
     public void Null_text_is_rejected()
     {
         Assert.Throws<ArgumentNullException>(() => Counter.Count(null!));

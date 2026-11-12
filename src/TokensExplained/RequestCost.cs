@@ -23,6 +23,7 @@ public static class RequestCost
         ArgumentNullException.ThrowIfNull(usage);
         ArgumentNullException.ThrowIfNull(price);
         usage.Validate();
+        price.Validate(); // a Price built in code skips PriceList, which is where prices are otherwise checked
         return Price.Cost(usage.Input, price.InputPerMillion)
              + Price.Cost(usage.Output, price.OutputPerMillion)
              + Price.Cost(usage.CacheRead, price.CacheReadPerMillion)
