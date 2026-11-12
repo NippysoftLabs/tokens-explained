@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TokensExplained/TokensExplained.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TokensExplained.Tests/TokensExplained.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/TokensDemo/TokensDemo.csproj" />
+    <Project Path="tools/HostileInputs/HostileInputs.csproj" />
+  </Folder>
+</Solution>

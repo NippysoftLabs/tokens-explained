@@ -1,0 +1,69 @@
+using System.Text.Json;
+using TokensExplained.Before;
+
+namespace TokensExplained.Tests;
+
+public class TokenTests
+{
+    private static readonly TokenCounter Counter = new();
+
+    private static List<ParallelText> Texts() => JsonSerializer.Deserialize<List<ParallelText>>(
+        File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "parallel-texts.json")),
+        new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
+
+    [Fact]
+    public void The_count_matches_the_example_in_the_Microsoft_documentation()
+    {
+        // learn.microsoft.com/dotnet/ai/how-to/use-tokenizers counts this sentence with gpt-5 (o200k_base): 16.
+        Assert.Equal(16, Counter.Count("Text tokenization is the process of splitting a string into a list of tokens."));
+    }
+
+    [Fact]
+    public void Before_words_are_not_tokens()
+    {
+        const string prompt = "Summarize this contract in five points and point out the penalty clauses for late delivery.";
+
+        Assert.Equal(15, WordEstimate.Count(prompt));
+        Assert.Equal(18, Counter.Count(prompt));
+    }
+
+    [Fact]
+    public void After_the_tokenizer_cuts_long_or_rare_words_into_pieces()
+    {
+        const string prompt = "Resume este contrato en cinco puntos y señala las cláusulas de penalización por retraso en la entrega.";
+        var pieces = Counter.Pieces(prompt);
+
+        Assert.Equal(21, pieces.Count);
+        Assert.Equal(["Resume", " este", " contrato"], pieces.Take(3));
+        Assert.Contains(" cláus", pieces);
+        Assert.Contains("ulas", pieces);
+        Assert.Equal(prompt, string.Concat(pieces));
+    }
+
+    [Fact]
+    public void A_character_split_across_tokens_is_shown_whole()
+    {
+        // The skin tone modifier is two tokens; Pieces joins them so the text stays readable.
+        Assert.Equal(["\U0001F44D", "\U0001F3FD (2 tokens)"], Counter.Pieces("\U0001F44D\U0001F3FD"));
+    }
+
+    [Fact]
+    public void The_same_text_in_Spanish_takes_more_tokens_than_in_English()
+    {
+        var comparisons = Texts().Select(t => LanguageComparison.Of(Counter, t)).ToList();
+
+        Assert.Equal(
+            [("udhr-article-1", 38, 33), ("udhr-article-3", 19, 13), ("support-reply", 38, 38), ("meeting-summary", 32, 26), ("prompt", 21, 18)],
+            comparisons.Select(c => (c.Name, c.SpanishTokens, c.EnglishTokens)));
+        // Not every text: the support reply is a tie. Over the five, Spanish takes 148 tokens and English 128.
+        Assert.Equal(148, comparisons.Sum(c => c.SpanishTokens));
+        Assert.Equal(128, comparisons.Sum(c => c.EnglishTokens));
+    }
+
+    [Fact]
+    public void Null_text_is_rejected()
+    {
+        Assert.Throws<ArgumentNullException>(() => Counter.Count(null!));
+        Assert.Throws<ArgumentNullException>(() => Counter.Pieces(null!));
+    }
+}

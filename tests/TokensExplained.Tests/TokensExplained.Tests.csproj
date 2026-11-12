@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TokensExplained\TokensExplained.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Copied next to the test assembly so the tests read the same files the demo uses. -->
+    <None Include="..\..\config\prices.json" Link="config\prices.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\samples\parallel-texts.json" Link="samples\parallel-texts.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

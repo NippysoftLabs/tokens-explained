@@ -1,0 +1,32 @@
+[
+  {
+    "name": "udhr-article-1",
+    "source": "United Nations, Universal Declaration of Human Rights (https://www.un.org/es/about-us/universal-declaration-of-human-rights and https://www.un.org/en/about-us/universal-declaration-of-human-rights)",
+    "spanish": "Todos los seres humanos nacen libres e iguales en dignidad y derechos y, dotados como están de razón y conciencia, deben comportarse fraternalmente los unos con los otros.",
+    "english": "All human beings are born free and equal in dignity and rights. They are endowed with reason and conscience and should act towards one another in a spirit of brotherhood."
+  },
+  {
+    "name": "udhr-article-3",
+    "source": "United Nations, Universal Declaration of Human Rights (https://www.un.org/es/about-us/universal-declaration-of-human-rights and https://www.un.org/en/about-us/universal-declaration-of-human-rights)",
+    "spanish": "Todo individuo tiene derecho a la vida, a la libertad y a la seguridad de su persona.",
+    "english": "Everyone has the right to life, liberty and security of person."
+  },
+  {
+    "name": "support-reply",
+    "source": "Written for this repository",
+    "spanish": "Hola, gracias por escribirnos. Tu pedido salió ayer del almacén y llegará entre el jueves y el viernes. Si no lo recibes, responde a este correo y lo revisamos.",
+    "english": "Hi, thanks for writing to us. Your order left the warehouse yesterday and will arrive between Thursday and Friday. If you don't receive it, reply to this email and we'll look into it."
+  },
+  {
+    "name": "meeting-summary",
+    "source": "Written for this repository",
+    "spanish": "Resumen de la reunión: el equipo de ventas aprobó el nuevo precio, finanzas revisará los descuentos y la próxima reunión es el martes a las diez.",
+    "english": "Meeting summary: the sales team approved the new price, finance will review the discounts and the next meeting is on Tuesday at ten."
+  },
+  {
+    "name": "prompt",
+    "source": "Written for this repository",
+    "spanish": "Resume este contrato en cinco puntos y señala las cláusulas de penalización por retraso en la entrega.",
+    "english": "Summarize this contract in five points and point out the penalty clauses for late delivery."
+  }
+]

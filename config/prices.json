@@ -1,0 +1,32 @@
+[
+  {
+    "model": "claude-sonnet-5-5",
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.1,
+    "cacheWritePerMillion": 2.5,
+    "minCacheableTokens": 512,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "checkedOn": "2026-11-12"
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.1,
+    "cacheWritePerMillion": 2.5,
+    "minCacheableTokens": 1024,
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "checkedOn": "2026-11-12"
+  },
+  {
+    "model": "gemini-4-carbon",
+    "inputPerMillion": 2,
+    "outputPerMillion": 10,
+    "cacheReadPerMillion": 0.1,
+    "cacheWritePerMillion": null,
+    "minCacheableTokens": 4096,
+    "source": "https://aistudio.google.com/docs/pricing",
+    "checkedOn": "2026-11-12"
+  }
+]

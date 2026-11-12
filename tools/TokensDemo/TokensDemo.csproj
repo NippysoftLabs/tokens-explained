@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TokensExplained\TokensExplained.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\config\prices.json" Link="config\prices.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\samples\parallel-texts.json" Link="samples\parallel-texts.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
